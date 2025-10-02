@@ -83,14 +83,27 @@
 
                 <!-- Game Controls -->
                 <div class="game-controls">
-                    <!-- Game Mode Selector (will be added by enhanced script) -->
+                    <div class="game-mode-selector">
+                        <h4>Game Mode</h4>
+                        <select id="game-mode" class="mode-select">
+                            <option value="human-vs-human">Human vs Human</option>
+                            <option value="human-vs-ai">Human vs AI</option>
+                        </select>
+                    </div>
+                    
+                    <div class="difficulty-selector hidden">
+                        <h4>AI Difficulty</h4>
+                        <select id="ai-difficulty" class="difficulty-select">
+                            <option value="easy">Easy</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
                     
                     <button id="new-game-btn" class="btn btn-primary">New Game</button>
                     <button id="undo-btn" class="btn btn-secondary">Undo Move</button>
                     <button id="rules-btn" class="btn btn-secondary">Rules</button>
-                </div>
-
-                <!-- Game Stats -->
+                </div>                <!-- Game Stats -->
                 <div class="game-stats">
                     <div class="stat-item">
                         <span class="stat-label">Moves:</span>

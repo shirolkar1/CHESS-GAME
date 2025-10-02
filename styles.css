@@ -486,6 +486,69 @@ body {
     display: none !important;
 }
 
+/* Enhanced Game Features */
+.game-mode-selector, .difficulty-selector, .theme-selector {
+    margin-bottom: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.game-mode-selector h4, .difficulty-selector h4, .theme-selector h4 {
+    margin-bottom: 10px;
+    color: #2c3e50;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.mode-select, .difficulty-select, .theme-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    background: white;
+    font-size: 0.9rem;
+}
+
+/* Theme Styles */
+.theme-wood .square.light {
+    background-color: #deb887;
+}
+
+.theme-wood .square.dark {
+    background-color: #8b4513;
+}
+
+.theme-marble .square.light {
+    background-color: #f5f5dc;
+}
+
+.theme-marble .square.dark {
+    background-color: #708090;
+}
+
+.theme-neon .square.light {
+    background-color: #00ffff;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.theme-neon .square.dark {
+    background-color: #8a2be2;
+    box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+}
+
+/* AI Thinking Animation */
+.ai-thinking {
+    background: linear-gradient(45deg, #3498db, #2980b9);
+    animation: thinking 1s infinite;
+}
+
+@keyframes thinking {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
     .game-main {

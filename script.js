@@ -1,4 +1,4 @@
-// Chess Game Implementation
+// Enhanced Chess Game Implementation with AI
 class ChessGame {
     constructor() {
         // Game state
@@ -11,6 +11,13 @@ class ChessGame {
         this.capturedPieces = { white: [], black: [] };
         this.gameStartTime = Date.now();
         this.gameTimer = null;
+        
+        // Enhanced features
+        this.gameMode = 'human-vs-human';
+        this.aiDifficulty = 'medium';
+        this.currentTheme = 'classic';
+        this.soundEnabled = true;
+        this.aiThinking = false;
         
         // Chess piece symbols
         this.pieces = {
@@ -42,7 +49,68 @@ class ChessGame {
         
         this.initializeGame();
         this.bindEvents();
+        this.bindEnhancedEvents();
         this.startGameTimer();
+    }
+    
+    bindEnhancedEvents() {
+        // Game mode selector
+        const gameModeSelect = document.getElementById('game-mode');
+        if (gameModeSelect) {
+            gameModeSelect.addEventListener('change', (e) => {
+                this.gameMode = e.target.value;
+                const difficultySelector = document.querySelector('.difficulty-selector');
+                
+                if (this.gameMode === 'human-vs-ai') {
+                    difficultySelector.classList.remove('hidden');
+                    this.updateGameStatus('Playing against AI - You are White');
+                } else {
+                    difficultySelector.classList.add('hidden');
+                    this.updateGameStatus('Human vs Human mode');
+                }
+            });
+        }
+        
+        // Difficulty selector
+        const difficultySelect = document.getElementById('ai-difficulty');
+        if (difficultySelect) {
+            difficultySelect.addEventListener('change', (e) => {
+                this.aiDifficulty = e.target.value;
+                this.updateGameStatus(`AI difficulty set to ${e.target.value}`);
+            });
+        }
+        
+        // Theme selector
+        const themeSelect = document.getElementById('board-theme');
+        if (themeSelect) {
+            themeSelect.addEventListener('change', (e) => {
+                this.changeTheme(e.target.value);
+            });
+        }
+        
+        // Sound toggle
+        const soundToggle = document.getElementById('sound-toggle');
+        if (soundToggle) {
+            soundToggle.addEventListener('click', () => {
+                this.soundEnabled = !this.soundEnabled;
+                soundToggle.textContent = this.soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
+            });
+        }
+    }
+    
+    changeTheme(theme) {
+        this.currentTheme = theme;
+        const boardElement = document.getElementById('chess-board');
+        
+        // Remove all theme classes
+        boardElement.classList.remove('theme-classic', 'theme-wood', 'theme-marble', 'theme-neon');
+        
+        // Add new theme class
+        if (theme !== 'classic') {
+            boardElement.classList.add(`theme-${theme}`);
+        }
+        
+        this.updateGameStatus(`Theme changed to ${theme}`);
     }
     
     initializeGame() {
@@ -408,6 +476,71 @@ class ChessGame {
     
     switchTurn() {
         this.currentPlayer = this.currentPlayer === 'white' ? 'black' : 'white';
+        
+        // If it's AI's turn and game mode is human vs AI
+        if (this.gameMode === 'human-vs-ai' && this.currentPlayer === 'black' && !this.gameOver) {
+            this.updateGameStatus('Computer is thinking...');
+            setTimeout(() => this.makeAIMove(), 1000);
+        }
+        
+        this.updateDisplay();
+    }
+    
+    makeAIMove() {
+        if (this.aiThinking || this.gameOver) return;
+        
+        this.aiThinking = true;
+        
+        // Get all valid moves for AI (black)
+        const possibleMoves = this.getAllValidMovesForColor('black');
+        
+        if (possibleMoves.length > 0) {
+            // Simple AI: choose a random move with slight preference for captures
+            let bestMove = possibleMoves[0];
+            
+            // Prefer captures
+            const captureMoves = possibleMoves.filter(move => {
+                const target = this.board[move.to.row][move.to.col];
+                return target && target.color === 'white';
+            });
+            
+            if (captureMoves.length > 0 && this.aiDifficulty !== 'easy') {
+                bestMove = captureMoves[Math.floor(Math.random() * captureMoves.length)];
+            } else {
+                // For easy mode or when no captures, pick randomly
+                bestMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+            }
+            
+            // Make the AI move
+            setTimeout(() => {
+                this.makeMove(bestMove.from.row, bestMove.from.col, bestMove.to.row, bestMove.to.col);
+                this.aiThinking = false;
+                this.updateGameStatus("Your turn!");
+            }, 500);
+        } else {
+            this.aiThinking = false;
+        }
+    }
+    
+    getAllValidMovesForColor(color) {
+        const moves = [];
+        
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                const piece = this.board[row][col];
+                if (piece && piece.color === color) {
+                    const validMoves = this.getValidMoves(row, col);
+                    validMoves.forEach(move => {
+                        moves.push({
+                            from: { row, col },
+                            to: { row: move.row, col: move.col }
+                        });
+                    });
+                }
+            }
+        }
+        
+        return moves;
     }
     
     isInBounds(row, col) {
@@ -683,6 +816,23 @@ class ChessGame {
         this.updateMoveHistory();
         this.updateCapturedPieces();
         this.updateMoveCount();
+        this.updateGameStatus();
+    }
+    
+    updateGameStatus(customMessage = null) {
+        const statusElement = document.getElementById('game-status');
+        if (statusElement) {
+            if (customMessage) {
+                statusElement.textContent = customMessage;
+            } else if (this.gameOver) {
+                statusElement.textContent = this.gameOverMessage || 'Game Over';
+            } else {
+                const playerName = this.gameMode === 'human-vs-ai' && this.currentPlayer === 'black' 
+                    ? 'Computer' 
+                    : this.currentPlayer.charAt(0).toUpperCase() + this.currentPlayer.slice(1);
+                statusElement.textContent = `${playerName}'s turn`;
+            }
+        }
     }
     
     updateTurnIndicator() {
@@ -807,10 +957,7 @@ class ChessGame {
 
 // Initialize the game when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    // Only initialize if enhanced version is not loaded
-    if (!window.enhancedModeEnabled) {
-        window.chessGameInstance = new ChessGame();
-    }
+    window.chessGameInstance = new ChessGame();
 });
 
 // Expose ChessGame class globally for enhanced features
