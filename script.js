@@ -807,5 +807,11 @@ class ChessGame {
 
 // Initialize the game when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    new ChessGame();
+    // Only initialize if enhanced version is not loaded
+    if (!window.enhancedModeEnabled) {
+        window.chessGameInstance = new ChessGame();
+    }
 });
+
+// Expose ChessGame class globally for enhanced features
+window.ChessGame = ChessGame;

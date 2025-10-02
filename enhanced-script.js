@@ -1,4 +1,6 @@
 // Enhanced Chess Game with AI Opponent
+window.enhancedModeEnabled = true;
+
 class EnhancedChessGame extends ChessGame {
     constructor() {
         super();
@@ -463,5 +465,6 @@ document.head.appendChild(styleElement);
 
 // Initialize enhanced chess game when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    new EnhancedChessGame();
+    // Initialize the enhanced chess game
+    window.chessGameInstance = new EnhancedChessGame();
 });
